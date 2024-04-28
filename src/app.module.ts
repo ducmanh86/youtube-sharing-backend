@@ -2,6 +2,7 @@ import path from 'path';
 import appConfig from './config/app.config';
 import authConfig from './config/auth.config';
 import mailConfig from './config/mail.config';
+import googleConfig from './config/google.config';
 import databaseConfig from './config/database.config';
 import { Module } from '@nestjs/common';
 import { HeaderResolver } from 'nestjs-i18n';
@@ -10,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from './mail/mail.module';
 import { HomeModule } from './home/home.module';
 import { UsersModule } from './users/users.module';
+import { VideosModule } from './videos/videos.module';
 import { AllConfigType } from './config/config.type';
 import { MailerModule } from './mailer/mailer.module';
 import { ForgotModule } from './forgot/forgot.module';
@@ -23,7 +25,7 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, authConfig, appConfig, mailConfig],
+      load: [databaseConfig, authConfig, appConfig, mailConfig, googleConfig],
       envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
@@ -62,6 +64,7 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
     MailModule,
     MailerModule,
     HomeModule,
+    VideosModule,
   ],
 })
 export class AppModule {}

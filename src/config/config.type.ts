@@ -46,9 +46,14 @@ export type MailConfig = {
   requireTLS: boolean;
 };
 
+export type GoogleConfig = {
+  apiKey?: string;
+};
+
 export type AllConfigType = {
   app: AppConfig;
   auth: AuthConfig;
   database: DatabaseConfig;
   mail: MailConfig;
+  google: GoogleConfig;
 };
