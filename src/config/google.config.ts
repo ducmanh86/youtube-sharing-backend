@@ -1,10 +1,11 @@
 import { registerAs } from '@nestjs/config';
 import { GoogleConfig } from './config.type';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import validateConfig from 'src/utils/validate-config';
 
 class EnvironmentVariablesValidator {
   @IsString()
+  @IsNotEmpty()
   GOOGLE_API_KEY: string;
 }
 
