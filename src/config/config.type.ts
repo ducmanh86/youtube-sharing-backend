@@ -48,6 +48,7 @@ export type MailConfig = {
 
 export type GoogleConfig = {
   apiKey?: string;
+  youtubeUrl: string;
 };
 
 export type AllConfigType = {

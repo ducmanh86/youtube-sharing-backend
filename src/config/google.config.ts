@@ -13,5 +13,7 @@ export default registerAs<GoogleConfig>('google', () => {
 
   return {
     apiKey: process.env.GOOGLE_API_KEY,
+    youtubeUrl:
+      process.env.YOUTUBE_URL_WITHOUT_ID || 'https://www.youtube.com/watch?v=',
   };
 });

@@ -20,6 +20,7 @@ import { SessionModule } from './session/session.module';
 import { I18nModule } from 'nestjs-i18n/dist/i18n.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
     MailerModule,
     HomeModule,
     VideosModule,
+    WebsocketModule,
   ],
 })
 export class AppModule {}

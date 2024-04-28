@@ -1,11 +1,13 @@
 import { Repository } from 'typeorm';
-import { youtube } from '@googleapis/youtube';
+import { youtube, youtube_v3 } from '@googleapis/youtube';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../config/config.type';
 import { Video } from './entities/video.entity';
 import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { AppGateway } from '../websocket/app.gateway';
+import Schema$Video = youtube_v3.Schema$Video;
 
 @Injectable()
 export class VideosService {
@@ -14,10 +16,11 @@ export class VideosService {
   constructor(
     @InjectRepository(Video)
     private videosRepository: Repository<Video>,
+    private readonly appGateway: AppGateway,
     private readonly configService: ConfigService<AllConfigType>,
   ) {}
 
-  async create(videoId: string, userId: number): Promise<Video> {
+  async create(videoId: string, userId: number): Promise<any> {
     const throwInvalidVideoIdError = () => {
       throw new HttpException(
         {
@@ -30,10 +33,10 @@ export class VideosService {
       );
     };
 
-    let videoData: any;
+    let videoRespone: any;
     try {
       this.logger.debug(videoId);
-      videoData = await youtube({
+      videoRespone = await youtube({
         auth: this.configService.getOrThrow('google.apiKey', {
           infer: true,
         }),
@@ -47,14 +50,41 @@ export class VideosService {
       throwInvalidVideoIdError();
     }
 
-    if (videoData?.data.items?.length === 0) {
-      this.logger.debug(videoData?.data);
+    const videoData: Schema$Video = videoRespone?.data.items.find(
+      (item: Schema$Video) => item.id === videoId,
+    );
+    this.logger.debug(videoData);
+    if (!videoData) {
       throwInvalidVideoIdError();
     }
 
-    return this.videosRepository.save(
-      this.videosRepository.create({ videoId, shareBy: { id: userId } }),
-    );
+    return this.videosRepository
+      .save(
+        this.videosRepository.create({ videoId, shareBy: { id: userId } }),
+        { reload: true },
+      )
+      .then(async (v) => {
+        const video = await this.videosRepository.findOne({
+          where: { id: v.id },
+        });
+
+        const result = {
+          ...video?.toJSON(),
+          url:
+            this.configService.getOrThrow('google.youtubeUrl', {
+              infer: true,
+            }) + videoId,
+          title: videoData.snippet?.title,
+          channel: videoData.snippet?.channelTitle,
+          description: videoData.snippet?.description,
+          thumbnail: videoData.snippet?.thumbnails?.standard?.url,
+        };
+
+        // notify the video data to clients
+        this.appGateway.server.emit('video', { video: result });
+
+        return result;
+      });
   }
 
   findManyWithPagination(
