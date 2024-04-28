@@ -1,31 +1,22 @@
 import {
   Column,
   AfterLoad,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
-  Index,
   ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
-import { Status } from '../../statuses/entities/status.entity';
 import bcrypt from 'bcryptjs';
-import { EntityHelper } from 'src/utils/entity-helper';
-import { AuthProvidersEnum } from 'src/auth/auth-providers.enum';
 import { Exclude, Expose } from 'class-transformer';
+import { Base } from '../../utils/base.entity';
+import { Status } from '../../statuses/entities/status.entity';
+import { AuthProvidersEnum } from '../../auth/auth-providers.enum';
 
 @Entity()
-export class User extends EntityHelper {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends Base<User> {
   // For "string | null" we need to use String type.
   // More info: https://github.com/typeorm/typeorm/issues/2567
   @Column({ type: String, unique: true, nullable: true })
-  @Expose({ groups: ['me', 'admin'] })
   email: string | null;
 
   @Column({ nullable: true })
@@ -35,9 +26,12 @@ export class User extends EntityHelper {
   @Exclude({ toPlainOnly: true })
   public previousPassword: string;
 
+  public fullName: string;
+
   @AfterLoad()
   public loadPreviousPassword(): void {
     this.previousPassword = this.password;
+    this.fullName = `${this.firstName} ${this.lastName}`.trim();
   }
 
   @BeforeInsert()
@@ -53,11 +47,9 @@ export class User extends EntityHelper {
   @Expose({ groups: ['me', 'admin'] })
   provider: string;
 
-  @Index()
   @Column({ type: String, nullable: true })
   firstName: string | null;
 
-  @Index()
   @Column({ type: String, nullable: true })
   lastName: string | null;
 
@@ -67,16 +59,6 @@ export class User extends EntityHelper {
   status?: Status;
 
   @Column({ type: String, nullable: true })
-  @Index()
   @Exclude({ toPlainOnly: true })
   hash: string | null;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }

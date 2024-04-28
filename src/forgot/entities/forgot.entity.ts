@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   DeleteDateColumn,
@@ -12,13 +11,12 @@ import { Allow } from 'class-validator';
 import { EntityHelper } from 'src/utils/entity-helper';
 
 @Entity()
-export class Forgot extends EntityHelper {
+export class Forgot extends EntityHelper<Forgot> {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Allow()
   @Column()
-  @Index()
   hash: string;
 
   @Allow()
