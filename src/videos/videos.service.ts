@@ -30,8 +30,10 @@ export class VideosService {
       );
     };
 
+    let videoData: any;
     try {
-      const videos = await youtube({
+      this.logger.debug(videoId);
+      videoData = await youtube({
         auth: this.configService.getOrThrow('google.apiKey', {
           infer: true,
         }),
@@ -40,12 +42,13 @@ export class VideosService {
         id: [videoId],
         part: ['snippet'],
       });
-      this.logger.debug(videos.data);
-      if (videos.data.items?.length === 0) {
-        throwInvalidVideoIdError();
-      }
     } catch (err) {
       this.logger.error(err);
+      throwInvalidVideoIdError();
+    }
+
+    if (videoData?.data.items?.length === 0) {
+      this.logger.debug(videoData?.data);
       throwInvalidVideoIdError();
     }
 
