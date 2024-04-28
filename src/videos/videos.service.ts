@@ -21,12 +21,15 @@ export class VideosService {
   ) {}
 
   async create(videoId: string, userId: number): Promise<any> {
+    const youtubeApiKey = this.configService.getOrThrow('google.apiKey', {
+      infer: true,
+    });
     const throwInvalidVideoIdError = () => {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            videoUrl: 'invalidVideoId',
+            data: 'invalidVideoId',
           },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -37,9 +40,7 @@ export class VideosService {
     try {
       this.logger.debug(videoId);
       videoRespone = await youtube({
-        auth: this.configService.getOrThrow('google.apiKey', {
-          infer: true,
-        }),
+        auth: youtubeApiKey,
         version: 'v3',
       }).videos.list({
         id: [videoId],
@@ -87,12 +88,54 @@ export class VideosService {
       });
   }
 
-  findManyWithPagination(
+  async findManyWithPagination(
     paginationOptions: IPaginationOptions,
-  ): Promise<Video[]> {
-    return this.videosRepository.find({
+  ): Promise<any[]> {
+    const youtubeApiKey = this.configService.getOrThrow('google.apiKey', {
+      infer: true,
+    });
+    const youtubeUrl = this.configService.getOrThrow('google.youtubeUrl', {
+      infer: true,
+    });
+
+    const videos = await this.videosRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
+    });
+
+    const videoIds = {};
+    videos.forEach((v: Video) => {
+      videoIds[v.videoId] = 1;
+    });
+
+    const res = await youtube({
+      auth: youtubeApiKey,
+      version: 'v3',
+    }).videos.list({
+      id: Object.keys(videoIds),
+      part: ['snippet'],
+    });
+    const youtubeItems = res?.data.items;
+
+    if (youtubeItems) {
+      youtubeItems.forEach((item) => {
+        if (item.id) {
+          videoIds[item.id] = item;
+        }
+      });
+    }
+
+    return videos.map((v1: Video) => {
+      const youtubeData = videoIds[v1.videoId];
+
+      return {
+        ...v1?.toJSON(),
+        url: youtubeData && youtubeUrl + v1.videoId,
+        title: youtubeData?.snippet?.title,
+        channel: youtubeData?.snippet?.channelTitle,
+        description: youtubeData?.snippet?.description,
+        thumbnail: youtubeData?.snippet?.thumbnails?.standard?.url,
+      };
     });
   }
 }
