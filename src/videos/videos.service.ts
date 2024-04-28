@@ -101,6 +101,7 @@ export class VideosService {
     const videos = await this.videosRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
+      order: { createdAt: 'DESC' },
     });
 
     const videoIds = {};
