@@ -25,6 +25,7 @@ WORKDIR /app
 
 COPY --from=build /app/dist /app/dist
 COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/src/mail/mail-templates/* /app/src/mail/mail-templates/
 
 COPY package*.json ./
 RUN npm prune --omit=dev --force
