@@ -109,6 +109,10 @@ export class VideosService {
       videoIds[v.videoId] = 1;
     });
 
+    if (Object.keys(videoIds).length === 0) {
+      return videos;
+    }
+
     const res = await youtube({
       auth: youtubeApiKey,
       version: 'v3',
