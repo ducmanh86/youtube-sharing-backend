@@ -1,0 +1,14 @@
+/node_modules
+/docs
+/dist
+/files
+/uploads
+/.data
+/.husky
+/.vscode
+/.idea
+.env
+Dockerfile
+e2e.Dockerfile
+docker-compose*.yaml
+*.md
