@@ -1,13 +1,15 @@
 import { Repository } from 'typeorm';
-import { youtube, youtube_v3 } from '@googleapis/youtube';
+import { youtube_v3 } from '@googleapis/youtube';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { AllConfigType } from '../config/config.type';
 import { Video } from './entities/video.entity';
-import { IPaginationOptions } from 'src/utils/types/pagination-options';
+import { IPaginationOptions } from '../utils/types/pagination-options';
 import { AppGateway } from '../websocket/app.gateway';
 import Schema$Video = youtube_v3.Schema$Video;
+import { getYoutubeVideoList } from '../utils/youtube';
+import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class VideosService {
@@ -36,23 +38,15 @@ export class VideosService {
       );
     };
 
-    let videoRespone: any;
+    let videoItems: any;
     try {
-      this.logger.debug(videoId);
-      videoRespone = await youtube({
-        auth: youtubeApiKey,
-        version: 'v3',
-      }).videos.list({
-        id: [videoId],
-        part: ['snippet'],
-      });
+      videoItems = await getYoutubeVideoList(youtubeApiKey, [videoId]);
     } catch (err) {
       this.logger.error(err);
       throwInvalidVideoIdError();
     }
 
-    const videoData: Schema$Video = videoRespone?.data.items.find((item: Schema$Video) => item.id === videoId);
-    this.logger.debug(videoData);
+    const videoData: Schema$Video = videoItems?.find((item: Schema$Video) => item.id === videoId);
     if (!videoData) {
       throwInvalidVideoIdError();
     }
@@ -65,7 +59,7 @@ export class VideosService {
         });
 
         const result = {
-          ...video?.toJSON(),
+          ...instanceToPlain(video),
           url:
             this.configService.getOrThrow('google.youtubeUrl', {
               infer: true,
@@ -106,14 +100,7 @@ export class VideosService {
       return videos;
     }
 
-    const res = await youtube({
-      auth: youtubeApiKey,
-      version: 'v3',
-    }).videos.list({
-      id: Object.keys(videoIds),
-      part: ['snippet'],
-    });
-    const youtubeItems = res?.data.items;
+    const youtubeItems = await getYoutubeVideoList(youtubeApiKey, Object.keys(videoIds));
 
     if (youtubeItems) {
       youtubeItems.forEach((item) => {
@@ -127,7 +114,7 @@ export class VideosService {
       const youtubeData = videoIds[v1.videoId];
 
       return {
-        ...v1?.toJSON(),
+        ...instanceToPlain(v1),
         url: youtubeData && youtubeUrl + v1.videoId,
         title: youtubeData?.snippet?.title,
         channel: youtubeData?.snippet?.channelTitle,

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { PageDTO, LimitDTO, infinityPagination } from 'src/utils/infinity-pagination';
+import { PageDTO, LimitDTO, infinityPagination } from '../utils/infinity-pagination';
 import { Video } from './entities/video.entity';
 import { VideosService } from './videos.service';
 import { ShareVideoDto } from './dto/share-video.dto';

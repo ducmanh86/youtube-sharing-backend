@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusEnum } from 'src/statuses/statuses.enum';
-import { User } from 'src/users/entities/user.entity';
+import { StatusEnum } from '../../../statuses/statuses.enum';
+import { User } from '../../../users/entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

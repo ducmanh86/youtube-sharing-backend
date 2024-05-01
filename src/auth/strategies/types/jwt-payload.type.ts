@@ -1,4 +1,4 @@
-import { Session } from 'src/session/entities/session.entity';
+import { Session } from '../../../session/entities/session.entity';
 import { User } from '../../../users/entities/user.entity';
 
 export type JwtPayloadType = Pick<User, 'id'> & {
