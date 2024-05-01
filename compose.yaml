@@ -18,8 +18,8 @@ services:
       - ${APP_PORT}:${APP_PORT}
     environment:
       TZ: ${TZ:-Asia/Ho_Chi_Minh}
-      VIRTUAL_HOST: youtube-api.manhtran.top
-      LETSENCRYPT_HOST: youtube-api.manhtran.top
+      VIRTUAL_HOST: ${BACKEND_DOMAIN}
+      LETSENCRYPT_HOST: ${BACKEND_DOMAIN}
       VIRTUAL_PORT: ${APP_PORT}
     env_file: .env
     depends_on:
