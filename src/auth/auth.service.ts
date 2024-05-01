@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import ms from 'ms';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
@@ -69,10 +64,7 @@ export class AuthService {
       );
     }
 
-    const isValidPassword = await bcrypt.compare(
-      loginDto.password,
-      user.password,
-    );
+    const isValidPassword = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isValidPassword) {
       throw new HttpException(
@@ -104,10 +96,7 @@ export class AuthService {
   }
 
   async register(dto: AuthRegisterLoginDto): Promise<void> {
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
+    const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
 
     await this.usersService.create({
       ...dto,
@@ -165,10 +154,7 @@ export class AuthService {
       );
     }
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
+    const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
     await this.forgotService.create({
       hash,
       user,
@@ -219,10 +205,7 @@ export class AuthService {
     });
   }
 
-  async update(
-    userJwtPayload: JwtPayloadType,
-    userDto: AuthUpdateDto,
-  ): Promise<NullableType<User>> {
+  async update(userJwtPayload: JwtPayloadType, userDto: AuthUpdateDto): Promise<NullableType<User>> {
     if (userDto.password) {
       if (userDto.oldPassword) {
         const currentUser = await this.usersService.findOne({
@@ -241,10 +224,7 @@ export class AuthService {
           );
         }
 
-        const isValidOldPassword = await bcrypt.compare(
-          userDto.oldPassword,
-          currentUser.password,
-        );
+        const isValidOldPassword = await bcrypt.compare(userDto.oldPassword, currentUser.password);
 
         if (!isValidOldPassword) {
           throw new HttpException(
@@ -284,9 +264,7 @@ export class AuthService {
     });
   }
 
-  async refreshToken(
-    data: Pick<JwtRefreshPayloadType, 'sessionId'>,
-  ): Promise<Omit<LoginResponseType, 'user'>> {
+  async refreshToken(data: Pick<JwtRefreshPayloadType, 'sessionId'>): Promise<Omit<LoginResponseType, 'user'>> {
     const session = await this.sessionService.findOne({
       where: {
         id: data.sessionId,
@@ -319,10 +297,7 @@ export class AuthService {
     });
   }
 
-  private async getTokensData(data: {
-    id: User['id'];
-    sessionId: Session['id'];
-  }) {
+  private async getTokensData(data: { id: User['id']; sessionId: Session['id'] }) {
     const tokenExpiresIn = this.configService.getOrThrow('auth.expires', {
       infer: true,
     });

@@ -15,14 +15,10 @@ export class UsersService {
   ) {}
 
   create(createProfileDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.save(
-      this.usersRepository.create(createProfileDto),
-    );
+    return this.usersRepository.save(this.usersRepository.create(createProfileDto));
   }
 
-  findManyWithPagination(
-    paginationOptions: IPaginationOptions,
-  ): Promise<User[]> {
+  findManyWithPagination(paginationOptions: IPaginationOptions): Promise<User[]> {
     return this.usersRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,

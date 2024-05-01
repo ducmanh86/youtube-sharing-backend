@@ -61,18 +61,9 @@ export class InitDatabase1688161010537 implements MigrationInterface {
         ],
       }),
     );
-    await queryRunner.createIndex(
-      'user',
-      new TableIndex({ columnNames: ['firstName'] }),
-    );
-    await queryRunner.createIndex(
-      'user',
-      new TableIndex({ columnNames: ['lastName'] }),
-    );
-    await queryRunner.createIndex(
-      'user',
-      new TableIndex({ columnNames: ['hash'] }),
-    );
+    await queryRunner.createIndex('user', new TableIndex({ columnNames: ['firstName'] }));
+    await queryRunner.createIndex('user', new TableIndex({ columnNames: ['lastName'] }));
+    await queryRunner.createIndex('user', new TableIndex({ columnNames: ['hash'] }));
 
     await queryRunner.createTable(
       new Table({
@@ -108,10 +99,7 @@ export class InitDatabase1688161010537 implements MigrationInterface {
         ],
       }),
     );
-    await queryRunner.createIndex(
-      'forgot',
-      new TableIndex({ columnNames: ['hash'] }),
-    );
+    await queryRunner.createIndex('forgot', new TableIndex({ columnNames: ['hash'] }));
 
     await queryRunner.createTable(
       new Table({
@@ -143,10 +131,7 @@ export class InitDatabase1688161010537 implements MigrationInterface {
         ],
       }),
     );
-    await queryRunner.createIndex(
-      'session',
-      new TableIndex({ columnNames: ['userId'] }),
-    );
+    await queryRunner.createIndex('session', new TableIndex({ columnNames: ['userId'] }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

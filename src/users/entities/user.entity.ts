@@ -1,11 +1,4 @@
-import {
-  Column,
-  AfterLoad,
-  Entity,
-  ManyToOne,
-  BeforeInsert,
-  BeforeUpdate,
-} from 'typeorm';
+import { Column, AfterLoad, Entity, ManyToOne, BeforeInsert, BeforeUpdate } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { Exclude, Expose } from 'class-transformer';
 import { Base } from '../../utils/base.entity';

@@ -11,18 +11,9 @@ import {
   Request,
   HttpException,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiTags,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  PageDTO,
-  LimitDTO,
-  infinityPagination,
-} from 'src/utils/infinity-pagination';
+import { PageDTO, LimitDTO, infinityPagination } from 'src/utils/infinity-pagination';
 import { Video } from './entities/video.entity';
 import { VideosService } from './videos.service';
 import { ShareVideoDto } from './dto/share-video.dto';
@@ -39,10 +30,7 @@ export class VideosController {
   @HttpCode(HttpStatus.CREATED)
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  create(
-    @Request() request: { user: any },
-    @Body() shareVideoDto: ShareVideoDto,
-  ): Promise<Video> {
+  create(@Request() request: { user: any }, @Body() shareVideoDto: ShareVideoDto): Promise<Video> {
     const videoUrl = new URL(shareVideoDto.videoUrl);
     const videoId = videoUrl.searchParams.get('v');
     if (!videoId) {

@@ -51,19 +51,14 @@ export class VideosService {
       throwInvalidVideoIdError();
     }
 
-    const videoData: Schema$Video = videoRespone?.data.items.find(
-      (item: Schema$Video) => item.id === videoId,
-    );
+    const videoData: Schema$Video = videoRespone?.data.items.find((item: Schema$Video) => item.id === videoId);
     this.logger.debug(videoData);
     if (!videoData) {
       throwInvalidVideoIdError();
     }
 
     return this.videosRepository
-      .save(
-        this.videosRepository.create({ videoId, shareBy: { id: userId } }),
-        { reload: true },
-      )
+      .save(this.videosRepository.create({ videoId, shareBy: { id: userId } }), { reload: true })
       .then(async (v) => {
         const video = await this.videosRepository.findOne({
           where: { id: v.id },
@@ -88,9 +83,7 @@ export class VideosService {
       });
   }
 
-  async findManyWithPagination(
-    paginationOptions: IPaginationOptions,
-  ): Promise<any[]> {
+  async findManyWithPagination(paginationOptions: IPaginationOptions): Promise<any[]> {
     const youtubeApiKey = this.configService.getOrThrow('google.apiKey', {
       infer: true,
     });
